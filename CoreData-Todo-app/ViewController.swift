@@ -75,28 +75,22 @@ class ViewController: UIViewController, UITableViewDelegate, UINavigationControl
         alert.addAction(cancelAction)
         present(alert, animated: true)
         
+        
+        
     }
     
     func save(nameValue: String) {
-        
-        guard let appDelegate =
-                UIApplication.shared.delegate as? AppDelegate else {
+        if nameValue.isEmpty {
+            print("Name value cannot be empty.")
             return
         }
-        
-        // 1
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
         let managedContext = appDelegate.persistentContainer.viewContext
-        
-        // 2
         let entity = NSEntityDescription.entity(forEntityName: "Note", in: managedContext)!
-        
-    
         let person = NSManagedObject(entity: entity, insertInto: managedContext)
-        
-        // 3
         person.setValue(nameValue, forKeyPath: "text")
-        
-        // 4
         do {
             try managedContext.save()
             people.append(person)
@@ -104,38 +98,55 @@ class ViewController: UIViewController, UITableViewDelegate, UINavigationControl
             print("Could not save. \(error), \(error.userInfo)")
         }
     }
+
+//    func save(nameValue: String) {
+//
+//        guard let appDelegate =
+//                UIApplication.shared.delegate as? AppDelegate else {
+//            return
+//        }
+//
+//        // 1
+//        let managedContext = appDelegate.persistentContainer.viewContext
+//
+//        // 2
+//        let entity = NSEntityDescription.entity(forEntityName: "Note", in: managedContext)!
+//
+//
+//        let person = NSManagedObject(entity: entity, insertInto: managedContext)
+//
+//        // 3
+//        person.setValue(nameValue, forKeyPath: "text")
+//
+//        // 4
+//        do {
+//            try managedContext.save()
+//            people.append(person)
+//        } catch let error as NSError {
+//            print("Could not save. \(error), \(error.userInfo)")
+//        }
+//    }
     
+
     func editName(editName: String, indexPath: IndexPath) {
-        
-        guard let appDelegate =
-                UIApplication.shared.delegate as? AppDelegate else {
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             return
         }
-        
-        // 1
-        let managedContext =
-        appDelegate.persistentContainer.viewContext
-        
-        // 2
-        let entity =
-        NSEntityDescription.entity(forEntityName: "Note",
-                                   in: managedContext)!
-        
-        let person = NSManagedObject(entity: entity,
-                                     insertInto: managedContext)
-        
-        // 3
-        person.setValue(editName, forKeyPath: "text")
-        // 4
+        let managedContext = appDelegate.persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Note")
         do {
+            let notes = try managedContext.fetch(fetchRequest)
+            let note = notes[indexPath.row]
+            note.setValue(editName, forKey: "text")
             try managedContext.save()
-            self.tableView?.reloadRows(at: [indexPath], with: .automatic)
-           // self.tableView?.reloadRows(at: [indexPath], with: .automatic)
-            //people.append(person)
-            self.tableView.reloadData()
+            people[indexPath.row] = note
+            tableView.beginUpdates()
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+            tableView.endUpdates()
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
     }
+
 }
 

@@ -26,10 +26,9 @@ extension ViewController: UITableViewDataSource {
 
       let editAction = UIContextualAction(style: .normal, title: "Edit") {_, _, _ in
         print("Edit Button")
-
         let person = self.people[indexPath.row]
         var personMessage = person.value(forKey: "text") as? String
-        let alert = UIAlertController(title: "Change the note", message: personMessage, preferredStyle: .alert)
+        let alert = UIAlertController(title: "Change the text", message: personMessage, preferredStyle: .alert)
         let saveAction = UIAlertAction(title: "Save", style: .default) { (action) in
             guard let textField = alert.textFields?.first else {
                 return
@@ -39,8 +38,8 @@ extension ViewController: UITableViewDataSource {
                     return
                 }
                 personMessage = textToEdit
-                //self.editName(editName: textToEdit, indexPath: indexPath)
-                //self.tableView.reloadData()
+                self.editName(editName: textToEdit, indexPath: indexPath)
+                self.tableView.endUpdates()
                 self.tableView?.reloadRows(at: [indexPath], with: .automatic)
             } else {
                 return
